@@ -1,0 +1,33 @@
+{
+  "speckit.customWorkflows": [
+    {
+      "name": "sdd",
+      "displayName": "SDD (Lean Pipeline)",
+      "description": "4-step lean SDD workflow: specify, plan, tasks, implement",
+      "steps": [
+        {
+          "name": "specify",
+          "label": "Specify",
+          "command": "sdd.specify",
+          "file": "spec.md"
+        },
+        {
+          "name": "plan",
+          "label": "Plan",
+          "command": "sdd.plan",
+          "file": "plan.md"
+        },
+        {
+          "name": "tasks",
+          "label": "Tasks",
+          "command": "sdd.tasks",
+          "file": "tasks.md"
+        }
+      ]
+    }
+  ],
+  "speckit.defaultWorkflow": "sdd",
+  "speckit.specDirectories": [
+    "specs"
+  ]
+}
