@@ -24,7 +24,7 @@ describe('NavBarComponent', () => {
   it('should render app title', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('.app-title');
-    expect(title?.textContent).toBe('test-ng20');
+    expect(title?.textContent).toBe('Demo');
   });
 
   it('should have home link', () => {
