@@ -21,13 +21,13 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^20.2.0",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@angular/cdk": "^20.2.0",
     "ngx-dev-toolbar": "file:../../ngx-dev-toolbar/dist/libs/ngx-dev-toolbar/ngx-dev-toolbar-1.0.3.tgz",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
@@ -37,6 +37,13 @@
     "@angular/build": "^20.3.8",
     "@angular/cli": "^20.3.8",
     "@angular/compiler-cli": "^20.3.0",
+    "@types/jasmine": "^6.0.0",
+    "jasmine-core": "^6.1.0",
+    "karma": "^6.4.4",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-coverage": "^2.2.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-jasmine-html-reporter": "^2.2.0",
     "typescript": "~5.9.2"
   }
 }

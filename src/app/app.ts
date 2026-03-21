@@ -1,15 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { ToolbarComponent } from 'ngx-dev-toolbar';
+import { NavBarComponent } from './layout/nav-bar';
 
 @Component({
   selector: 'app-root',
-  imports: [ToolbarComponent],
+  imports: [ToolbarComponent, RouterOutlet, NavBarComponent],
   template: `
-    <h1>Welcome to {{ title() }}!</h1>
+    <app-nav-bar />
+    <router-outlet />
     <ndt-toolbar />
   `,
   styles: [],
 })
-export class App {
-  protected readonly title = signal('test-ng20');
-}
+export class App {}
