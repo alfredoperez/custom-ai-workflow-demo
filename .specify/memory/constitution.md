@@ -1,50 +1,108 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: N/A → 1.0.0 (initial)
+- Added principles:
+  - I. Angular-First Architecture
+  - II. Type Safety & Test Discipline
+  - III. Simplicity & Accessible Defaults
+- Added sections:
+  - Development Constraints
+  - Development Workflow
+  - Governance
+- Templates requiring updates:
+  - .specify/templates/plan-template.md — ✅ compatible (Constitution Check section exists)
+  - .specify/templates/spec-template.md — ✅ compatible (no principle-specific refs)
+  - .specify/templates/tasks-template.md — ✅ compatible (phase structure is generic)
+- Follow-up TODOs: none
+-->
+
+# TestNg20 Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Angular-First Architecture
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All features MUST use Angular's recommended patterns and latest APIs:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- Standalone components exclusively — no NgModules for declarations
+- Signals for state management; avoid RxJS where signals suffice
+- Angular's built-in control flow (`@if`, `@for`, `@switch`) over
+  structural directives
+- OnPush change detection by default
+- Router-level lazy loading for feature boundaries
+- Follow Angular style guide naming: `feature.type.ts`
+  (e.g., `user-list.component.ts`)
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: Consistency with Angular 20 idioms keeps the codebase
+approachable and aligned with upstream tooling.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Type Safety & Test Discipline
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+TypeScript strict mode MUST remain enabled (`strict: true`). Code
+MUST NOT use `any` except at verified system boundaries (e.g.,
+third-party untyped APIs).
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Prefer narrowly typed interfaces over broad unions
+- Tests MUST accompany non-trivial logic; red-green-refactor when
+  adding new behavior
+- Integration tests (TestBed) for component interactions; unit tests
+  for pure services and utilities
+- Test files colocated with source: `feature.component.spec.ts`
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: Strict types catch errors at compile time; colocated
+tests keep feedback loops short.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Simplicity & Accessible Defaults
+
+Start with the simplest implementation that satisfies the
+requirement — YAGNI applies:
+
+- No premature abstractions; three similar lines beat a helper
+  nobody reuses
+- No state management libraries until signals prove insufficient
+- Semantic HTML elements MUST be preferred over generic `<div>`/
+  `<span>` for interactive controls
+- All interactive elements MUST be keyboard-navigable and include
+  appropriate ARIA attributes when semantic HTML is insufficient
+- Color contrast MUST meet WCAG 2.1 AA minimum (4.5:1 for text)
+
+Rationale: A demo project must remain easy to read and modify;
+accessibility habits formed here carry into production work.
+
+## Development Constraints
+
+- **Framework**: Angular 20 with standalone APIs
+- **Language**: TypeScript 5.9+ (`strict: true`)
+- **Styling**: Component-scoped styles; no global CSS beyond
+  resets/theming tokens
+- **Dependencies**: Minimize third-party packages; justify each
+  addition in the PR description
+- **Build**: Angular CLI (`ng build`, `ng serve`, `ng test`)
+
+## Development Workflow
+
+- Feature work on branches; `main` stays deployable
+- Commits SHOULD be small and focused (one concern per commit)
+- `ng build` and `ng test` MUST pass before merging
+- Code review is encouraged but not gated (sandbox context)
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is the authoritative source for project-level
+decisions. When a guideline conflicts with an ad-hoc preference,
+the constitution wins unless formally amended.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment process**:
+1. Propose the change with rationale
+2. Update this file with new version
+3. Verify dependent templates still align
+4. Commit with message `docs: amend constitution to vX.Y.Z`
+
+**Versioning**: MAJOR for principle removals/redefinitions, MINOR
+for new principles or material expansions, PATCH for wording fixes.
+
+**Compliance**: Constitution checks are integrated into the plan
+template (`Constitution Check` section). Each plan MUST confirm
+alignment before Phase 0 research.
+
+**Version**: 1.0.0 | **Ratified**: 2026-03-21 | **Last Amended**: 2026-03-21
