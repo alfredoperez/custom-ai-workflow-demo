@@ -4,7 +4,6 @@ handoffs:
   - label: Build Plan
     agent: sdd.plan
     prompt: Create a lean plan for this spec
-    send: true
 ---
 
 ## User Input
@@ -57,22 +56,7 @@ Without spawning a subagent, read 2–3 relevant files to understand the feature
 
 ---
 
-### 4. Detect Complexity
-
-Based on what you found in Explore, classify the change:
-
-| Signal | Mode |
-|--------|------|
-| Touches 1 existing file, change is <10 lines | **minimal** |
-| Pure style or config tweak | **minimal** |
-| Touches 2+ files, or adds a new component/service | **normal** |
-| Introduces new public behavior or API | **normal** |
-
-If unclear, default to **normal**.
-
----
-
-### 5. Write `specs/{NNN}-{slug}/spec.md`
+### 4. Write `specs/{NNN}-{slug}/spec.md`
 
 ```markdown
 # Spec: {Feature Name}
@@ -110,67 +94,9 @@ If unclear, default to **normal**.
 
 ---
 
-### 6. Minimal Mode — Write `plan.md` + `tasks.md`
+### 5. Summary
 
-Skip this step if mode is **normal**.
-
-Write `specs/{NNN}-{slug}/plan.md`:
-
-```markdown
-# Plan: {Feature Name}
-
-**Spec**: specs/{NNN}-{slug}/spec.md | **Date**: {TODAY}
-
-## Approach
-
-[1–2 sentences describing the implementation strategy.]
-
-## Files to Change
-
-- `path/to/file` — [what changes]
-
-## Phase 1 Tasks
-
-| ID | Do | Verify |
-|----|-----|--------|
-| T001 | [task description] | [verification step] |
-```
-
-Write `specs/{NNN}-{slug}/tasks.md`:
-
-```markdown
-# Tasks: {Feature Name}
-
-## Phase 1 — Core
-
-- [ ] **T001** · [task description]
-  - **Do**: [specific action]
-  - **Verify**: [how to confirm it works]
-```
-
-Update `specs/{NNN}-{slug}/state.json`:
-
-```json
-{ "step": "tasks", "branch": "{NNN}-{slug}", "task": null, "updated": "{TODAY}" }
-```
-
----
-
-### 7. Summary
-
-**Minimal mode** — display exactly this format:
-
-```
---- Specify complete (Fast Mode) ---
-Feature: {Feature Name}  |  Branch: {NNN}-{slug}
-Spec:    specs/{NNN}-{slug}/spec.md
-Plan:    specs/{NNN}-{slug}/plan.md
-Tasks:   specs/{NNN}-{slug}/tasks.md
-
-Next: /sdd.implement {NNN}-{slug}
-```
-
-**Normal mode** — display exactly this format:
+Display exactly this format:
 
 ```
 --- Specify complete ---
