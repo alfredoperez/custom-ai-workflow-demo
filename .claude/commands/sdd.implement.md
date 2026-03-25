@@ -11,8 +11,13 @@ Find the most recently modified directory under `specs/` that contains `tasks.md
 Read in parallel:
 
 - `specs/{NNN}-{slug}/tasks.md` — all Phase 1 and Phase 2 tasks
-- `specs/{NNN}-{slug}/spec.md` — feature name, requirements, scenarios
-- `specs/{NNN}-{slug}/plan.md` — approach, files to change
+- `specs/{NNN}-{slug}/spec.md` — feature name, requirements, scenarios (for CP1 verification)
+- `specs/{NNN}-{slug}/plan.md` — approach, files, issue number if present
+- `specs/{NNN}-{slug}/state.json` — current step/task (if exists; note if resuming mid-implement)
+
+Determine commit scope from the primary directory being modified (e.g., `toolbar`, `ui`, `core`). If unclear, omit scope.
+
+Determine issue number from plan.md or spec.md if present.
 
 If no tasks found, stop: "Run `/sdd.specify`, `/sdd.plan`, and `/sdd.tasks` first."
 
@@ -24,7 +29,73 @@ Update `specs/{NNN}-{slug}/state.json`:
 
 ---
 
-### 2. Phase 1 — Sequential Core Implementation
+### Context Recovery (if resuming)
+
+If `state.json` shows `step = "implement"` and `task = "T00N"`:
+
+1. Check if worktree exists at `.claude/worktrees/{NNN}-{slug}/` — if so, `cd` into it
+2. If no worktree exists, use `EnterWorktree` with `name: "{NNN}-{slug}"` to create one
+3. Verify branch name: `git branch --show-current` — if it starts with `worktree-`, rename it: `git branch -m {NNN}-{slug}`
+4. Read `spec.md` for feature context
+5. Read `tasks.md` — `[x]` = done, `[ ]` = remaining
+6. Resume from the first unchecked task
+7. Do NOT re-run completed tasks — trust the checkmarks and existing commits
+
+---
+
+### 2. Create Worktree + Branch
+
+Use Claude's built-in **`EnterWorktree`** tool with `name` set to `{NNN}-{slug}`.
+
+This will:
+- Create a worktree at `.claude/worktrees/{NNN}-{slug}/`
+- Create a new branch based on HEAD
+- **Switch the session's working directory** into the worktree
+
+**Immediately after `EnterWorktree`, verify you are inside the worktree:**
+
+```bash
+pwd
+```
+
+The output **must** contain `.claude/worktrees/{NNN}-{slug}`. **If `pwd` does NOT show the worktree path, `cd` into `.claude/worktrees/{NNN}-{slug}/` before continuing.**
+
+**Immediately rename the branch** (EnterWorktree adds a `worktree-` prefix):
+
+```bash
+git branch -m {NNN}-{slug}
+```
+
+Verify the rename succeeded:
+
+```bash
+git branch --show-current
+```
+
+It should print `{NNN}-{slug}` (no `worktree-` prefix). The branch name for Step 8 is `{NNN}-{slug}`.
+
+Copy the spec artifacts into the worktree:
+
+```bash
+cp -r {REPO_ROOT}/specs/{NNN}-{slug}/ specs/{NNN}-{slug}/
+```
+
+Where `{REPO_ROOT}` is the main working tree root (the parent of `.claude/worktrees/`). This makes `spec.md`, `plan.md`, `tasks.md`, and `state.json` available inside the worktree.
+
+**All subsequent steps run from the worktree.**
+
+**If `EnterWorktree` fails** (worktree already exists from a previous run):
+
+```bash
+cd .claude/worktrees/{NNN}-{slug}
+git branch --show-current
+```
+
+If the branch name starts with `worktree-`, rename it: `git branch -m {NNN}-{slug}`
+
+---
+
+### 3. Phase 1 — Sequential Core Implementation
 
 Execute tasks T001 → T002 → ... through all Phase 1 tasks in order.
 
@@ -39,24 +110,65 @@ For each task:
 
 | Situation                              | Action                                            |
 | -------------------------------------- | ------------------------------------------------- |
-| Bug, import error, or type mismatch    | Fix silently — note in summary                    |
-| Missing dependency                     | Fix silently — note in summary                    |
+| Bug, import error, or type mismatch    | Fix silently — note for CP1                       |
+| Missing dependency                     | Fix silently — note for CP1                       |
 | Architectural approach needs to change | **STOP. Explain to user and ask how to proceed.** |
 | Task is impossible as written          | **STOP. Explain why and ask how to proceed.**     |
 
 ---
 
-### 3. Phase 2 — Parallel Tasks
+### 4. Phase 2 — Parallel Agents (normal mode only)
 
-Skip if no `[P][A]` tasks exist.
+Skip if spec.md shows mode is `"minimal"`.
 
 Launch all `[P][A]` tasks as parallel subagents. Wait for all to complete.
 
 ---
 
-### 4. Commit
+### 5. Checkpoint — Commit + PR
 
-Stage the changed files explicitly (no `git add -A`). Include the spec artifacts (`specs/{NNN}-{slug}/`) alongside implementation files:
+Display exactly this format, then use the **AskUserQuestion** tool:
+
+```
+--- Checkpoint: Commit & PR ---
+Phase 1: T001–T00N complete
+Phase 2: {status or "N/A — minimal mode"}
+
+Changes:
+- path/to/file: [one line description]
+- path/to/file: [one line description]
+
+Silent fixes: [list any, or "none"]
+
+Commit: {type}({scope}): {short description}
+        Closes #{N}  (omit if no issue)
+
+PR title:  {type}({scope}): {short description}
+PR body:
+  ## What
+  - [bullet from spec]
+  - [bullet from spec]
+
+  ## Why
+  [one sentence from spec]
+
+  ## Testing
+  - [verify step from tasks]
+  - [verify step from tasks]
+
+  Closes #{N}  (omit if no issue)
+```
+
+Call **AskUserQuestion** with these options:
+- **Approve** — proceed to commit and PR
+- **Edit** — user provides notes in the "Other" field; apply changes, redisplay checkpoint
+- **Fix** — user provides fix notes; address the issue, update `tasks.md`, return to checkpoint
+
+---
+
+### 6. Commit + PR
+
+Stage the changed files explicitly (no `git add -A`). **Always include the spec artifacts** (`specs/{NNN}-{slug}/`) alongside implementation files:
 
 ```bash
 git add path/to/file1 path/to/file2 ... specs/{NNN}-{slug}/
@@ -65,18 +177,52 @@ git add path/to/file1 path/to/file2 ... specs/{NNN}-{slug}/
 Commit using conventional commit format:
 
 ```bash
-git commit -m "{type}({scope}): {short description}"
+git commit -m "{type}({scope}): {short description}" -m "Closes #{N}"
 ```
 
 Rules:
 
 - `type`: `feat`, `fix`, `refactor`, `docs`, or `chore`
-- `scope`: lowercase, from primary directory modified. Omit if unclear.
+- `scope`: lowercase, from primary directory modified (e.g., `toolbar`). Omit if unclear.
 - Short description: imperative, lowercase, no period, max 72 chars
+- `Closes #N` line: only if issue number exists
+- **No Co-Authored-By or attribution lines**
+
+Push and open PR (use the branch name obtained from `git branch --show-current` in Step 2):
+
+```bash
+git push -u origin {branch-name}
+gh pr create \
+  --title "{type}({scope}): {short description}" \
+  --body "$(cat <<'EOF'
+## What
+
+- [bullet from spec]
+- [bullet from spec]
+
+## Why
+
+[one sentence from spec]
+
+## Testing
+
+- [verify step from tasks]
+- [verify step from tasks]
+
+Closes #{N}
+EOF
+)"
+```
+
+Rules:
+
+- PR title matches commit message exactly
+- `Closes #N` only if issue exists — omit otherwise
+- No "Generated with Claude Code" or any AI attribution
 
 ---
 
-### 5. Summary
+### 7. Summary
 
 Display exactly this format:
 
@@ -84,4 +230,6 @@ Display exactly this format:
 --- Done ---
 Feature: {Feature Name}
 Commit:  {type}({scope}): {description}
+PR:      {PR URL}
+Branch:  {branch-name}
 ```
