@@ -43,7 +43,7 @@ mkdir -p specs/{NNN}-{slug}
 Write `specs/{NNN}-{slug}/state.json`:
 
 ```json
-{ "step": "specify", "branch": "{NNN}-{slug}", "task": null, "updated": "{TODAY}" }
+{ "step": "specify", "task": null, "updated": "{TODAY}" }
 ```
 
 ---
@@ -61,7 +61,7 @@ Without spawning a subagent, read 2–3 relevant files to understand the feature
 ```markdown
 # Spec: {Feature Name}
 
-**Branch**: {NNN}-{slug} | **Date**: {TODAY}
+**Date**: {TODAY}
 
 ## Summary
 
@@ -100,7 +100,7 @@ Display exactly this format:
 
 ```
 --- Specify complete ---
-Feature: {Feature Name}  |  Branch: {NNN}-{slug}
+Feature: {Feature Name}
 Spec:    specs/{NNN}-{slug}/spec.md
 
 Next: /sdd.plan {NNN}-{slug}
