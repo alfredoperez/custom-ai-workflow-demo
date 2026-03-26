@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "test": "jest"
   },
   "prettier": {
     "printWidth": 100,
@@ -21,13 +22,13 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^20.2.0",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@angular/cdk": "^20.2.0",
     "ngx-dev-toolbar": "file:../../ngx-dev-toolbar/dist/libs/ngx-dev-toolbar/ngx-dev-toolbar-1.0.3.tgz",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
@@ -37,6 +38,12 @@
     "@angular/build": "^20.3.8",
     "@angular/cli": "^20.3.8",
     "@angular/compiler-cli": "^20.3.0",
+    "@angular/platform-browser-dynamic": "^21.2.6",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jest-preset-angular": "^16.1.1",
+    "ts-jest": "^29.4.6",
     "typescript": "~5.9.2"
   }
 }
